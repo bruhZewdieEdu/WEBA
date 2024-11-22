@@ -1,64 +1,43 @@
 <?php
-require_once '../../config/database.php';
-require_once '../../controllers/UtilisateurController.php';
 
-$database = new Database();
-$db = $database->getConnection();
-$controller = new UtilisateurController($db);
-
+// Vérification de la présence de l'ID utilisateur
 if (!isset($_GET['id'])) {
     die("ID utilisateur manquant.");
 }
 
-$id = $_GET['id'];
-$user = $controller->model->read()->fetch(PDO::FETCH_ASSOC);
+$id = intval($_GET['id']); // S'assurer que l'ID est un entier
+$user = $controller->getUserById($id); // Récupérer les informations de l'utilisateur
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $data = [
-        'nom' => $_POST['nom'],
-        'prenom' => $_POST['prenom'],
-        'date_naiss' => $_POST['date_naiss'],
-        'adresse' => $_POST['adresse'],
-        'mail' => $_POST['mail'],
-        'num_tel' => $_POST['num_tel'],
-        'statut' => $_POST['statut'],
-        'type' => $_POST['type']
-    ];
-    if ($controller->update($id, $data)) {
+if (!$user) {
+    die("Utilisateur non trouvé.");
+}
+
+// Traitement de la demande de suppression
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
+        if ($controller->delete($id)) {
+            header("Location: index.php?message=Utilisateur supprimé avec succès");
+            exit;
+        } else {
+            echo "<p>Erreur lors de la suppression de l'utilisateur.</p>";
+        }
+    } else {
         header("Location: index.php");
         exit;
-    } else {
-        echo "Erreur lors de la mise à jour de l'utilisateur.";
     }
 }
 ?>
 
-<h1>Modifier un utilisateur</h1>
-<form method="POST">
-    <label>Nom :</label>
-    <input type="text" name="nom" value="<?= $user['UTILISATEUR_NOM']; ?>" required>
-    <br>
-    <label>Prénom :</label>
-    <input type="text" name="prenom" value="<?= $user['UTILISATEUR_PRENOM']; ?>" required>
-    <br>
-    <label>Date de naissance :</label>
-    <input type="date" name="date_naiss" value="<?= $user['UTILISATEUR_DATE_NAISS']; ?>" required>
-    <br>
-    <label>Adresse :</label>
-    <input type="text" name="adresse" value="<?= $user['UTILISATEUR_ADRESSE']; ?>" required>
-    <br>
-    <label>Email :</label>
-    <input type="email" name="mail" value="<?= $user['UTILISATEUR_MAIL']; ?>" required>
-    <br>
-    <label>Numéro de téléphone :</label>
-    <input type="text" name="num_tel" value="<?= $user['UTILISATEUR_NUM_TEL']; ?>" required>
-    <br>
-    <label>Statut :</label>
-    <input type="text" name="statut" value="<?= $user['UTILISATEUR_STATUT']; ?>" required>
-    <br>
-    <label>Type :</label>
-    <input type="text" name="type" value="<?= $user['UTILISATEUR_TYPE']; ?>" required>
-    <br>
-    <button type="submit">Mettre à jour</button>
+<h1>Supprimer un utilisateur</h1>
+<p>Êtes-vous sûr de vouloir supprimer l'utilisateur suivant ?</p>
+
+<ul>
+    <li><strong>Nom :</strong> <?= htmlspecialchars($user['UTILISATEUR_NOM']); ?></li>
+    <li><strong>Prénom :</strong> <?= htmlspecialchars($user['UTILISATEUR_PRENOM']); ?></li>
+    <li><strong>Email :</strong> <?= htmlspecialchars($user['UTILISATEUR_MAIL']); ?></li>
+</ul>
+
+<form method="POST" action="index.php?action=delete&id=<?= urlencode($user['UTILISATEURID']) ?>">
+    <button type="submit" name="confirm" value="yes">Confirmer la suppression</button>
+    <a href="index.php">Annuler</a>
 </form>
-<a href="index.php">Retour à la liste</a>

@@ -12,7 +12,7 @@ class ModelUtilisateur {
 
     /**
      * Lire tous les utilisateurs
-     * @return PDOStatement Résultats de la requête
+     * @return array Résultats de la requête
      */
     public function read() {
         $query = "SELECT * FROM " . $this->table_name;
@@ -20,17 +20,41 @@ class ModelUtilisateur {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    
-    public function create($nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type) {
+
+    /**
+     * Lire un utilisateur par ID
+     * @param int $id ID de l'utilisateur
+     * @return array|null Détails de l'utilisateur ou null si non trouvé
+     */
+    public function readById($id) {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE UTILISATEURID = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Créer un nouvel utilisateur
+     * @param string $nom
+     * @param string $prenom
+     * @param string $date_naiss
+     * @param string $adresse
+     * @param string $mail
+     * @param string $num_tel
+     * @param string $statut
+     * @param string $type
+     * @param string $mdp
+     * @return bool Résultat de l'insertion
+     */
+    public function create($nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp) {
         $query = "INSERT INTO " . $this->table_name . "
                   (UTILISATEUR_NOM, UTILISATEUR_PRENOM, UTILISATEUR_DATE_NAISS,
                    UTILISATEUR_ADRESSE, UTILISATEUR_MAIL, UTILISATEUR_NUM_TEL,
-                   UTILISATEUR_STATUT, UTILISATEUR_TYPE)
-                  VALUES (:nom, :prenom, :date_naiss, :adresse, :mail, :num_tel, :statut, :type)";
+                   UTILISATEUR_STATUT, UTILISATEUR_TYPE, UTILISATEUR_MOT_DE_PASSE)
+                  VALUES (:nom, :prenom, :date_naiss, :adresse, :mail, :num_tel, :statut, :type, :mdp)";
         $stmt = $this->conn->prepare($query);
 
-        // Liaison des paramètres
         $stmt->bindParam(":nom", $nom);
         $stmt->bindParam(":prenom", $prenom);
         $stmt->bindParam(":date_naiss", $date_naiss);
@@ -39,18 +63,75 @@ class ModelUtilisateur {
         $stmt->bindParam(":num_tel", $num_tel);
         $stmt->bindParam(":statut", $statut);
         $stmt->bindParam(":type", $type);
+        $stmt->bindParam(":mdp", $mdp);
 
         try {
             return $stmt->execute();
         } catch (PDOException $e) {
-            // Gérer les erreurs de duplication d'e-mail ou autres
-            echo "Erreur : " . $e->getMessage();
-            return false;
+            throw new Exception("Erreur lors de l'insertion de l'utilisateur : " . $e->getMessage());
         }
     }
-    public function modifierById($id, $nom){
-        //MODIFIER LE NOM DE L'UTILISATEUR AVEC L'ID
-        $query = "UPDATE " . $this->table_name . " SET UTILISATEUR_NOM = :nom WHERE UTILISATEUR_ID = :id";
 
+    /**
+     * Mettre à jour les informations d'un utilisateur
+     * @param int $id
+     * @param string $nom
+     * @param string $prenom
+     * @param string $date_naiss
+     * @param string $adresse
+     * @param string $mail
+     * @param string $num_tel
+     * @param string $statut
+     * @param string $type
+     * @param string $mdp
+     * @return bool Résultat de la mise à jour
+     */
+    public function update($id, $nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp) {
+        $query = "UPDATE " . $this->table_name . "
+                  SET UTILISATEUR_NOM = :nom,
+                      UTILISATEUR_PRENOM = :prenom,
+                      UTILISATEUR_DATE_NAISS = :date_naiss,
+                      UTILISATEUR_ADRESSE = :adresse,
+                      UTILISATEUR_MAIL = :mail,
+                      UTILISATEUR_NUM_TEL = :num_tel,
+                      UTILISATEUR_STATUT = :statut,
+                      UTILISATEUR_TYPE = :type
+                      UTILISATEUR_MOT_DE_PASSE = :mdp
+                  WHERE UTILISATEURID = :id";
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->bindParam(":nom", $nom);
+        $stmt->bindParam(":prenom", $prenom);
+        $stmt->bindParam(":date_naiss", $date_naiss);
+        $stmt->bindParam(":adresse", $adresse);
+        $stmt->bindParam(":mail", $mail);
+        $stmt->bindParam(":num_tel", $num_tel);
+        $stmt->bindParam(":statut", $statut);
+        $stmt->bindParam(":type", $type);
+        $stmt->bindParam(":mdp", $mdp);
+
+        try {
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Supprimer un utilisateur
+     * @param int $id
+     * @return bool Résultat de la suppression
+     */
+    public function delete($id) {
+        $query = "DELETE FROM " . $this->table_name . " WHERE UTILISATEURID = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+
+        try {
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la suppression de l'utilisateur : " . $e->getMessage());
+        }
     }
 }
