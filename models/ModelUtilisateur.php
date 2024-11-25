@@ -2,11 +2,13 @@
 
 require_once '../config/Database.php';
 
-class ModelUtilisateur {
+class ModelUtilisateur
+{
     private $conn;
     private $table_name = "UTILISATEUR";
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->conn = Database::getInstance();
     }
 
@@ -14,7 +16,8 @@ class ModelUtilisateur {
      * Lire tous les utilisateurs
      * @return array Résultats de la requête
      */
-    public function read() {
+    public function read()
+    {
         $query = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -26,7 +29,8 @@ class ModelUtilisateur {
      * @param int $id ID de l'utilisateur
      * @return array|null Détails de l'utilisateur ou null si non trouvé
      */
-    public function readById($id) {
+    public function readById($id)
+    {
         $query = "SELECT * FROM " . $this->table_name . " WHERE UTILISATEURID = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
@@ -47,7 +51,8 @@ class ModelUtilisateur {
      * @param string $mdp
      * @return bool Résultat de l'insertion
      */
-    public function create($nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp) {
+    public function create($nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp)
+    {
         $query = "INSERT INTO " . $this->table_name . "
                   (UTILISATEUR_NOM, UTILISATEUR_PRENOM, UTILISATEUR_DATE_NAISS,
                    UTILISATEUR_ADRESSE, UTILISATEUR_MAIL, UTILISATEUR_NUM_TEL,
@@ -86,7 +91,8 @@ class ModelUtilisateur {
      * @param string $mdp
      * @return bool Résultat de la mise à jour
      */
-    public function update($id, $nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp) {
+    public function update($id, $nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type)
+    {
         $query = "UPDATE " . $this->table_name . "
                   SET UTILISATEUR_NOM = :nom,
                       UTILISATEUR_PRENOM = :prenom,
@@ -96,7 +102,6 @@ class ModelUtilisateur {
                       UTILISATEUR_NUM_TEL = :num_tel,
                       UTILISATEUR_STATUT = :statut,
                       UTILISATEUR_TYPE = :type
-                      UTILISATEUR_MOT_DE_PASSE = :mdp
                   WHERE UTILISATEURID = :id";
         $stmt = $this->conn->prepare($query);
 
@@ -109,7 +114,6 @@ class ModelUtilisateur {
         $stmt->bindParam(":num_tel", $num_tel);
         $stmt->bindParam(":statut", $statut);
         $stmt->bindParam(":type", $type);
-        $stmt->bindParam(":mdp", $mdp);
 
         try {
             return $stmt->execute();
@@ -123,7 +127,8 @@ class ModelUtilisateur {
      * @param int $id
      * @return bool Résultat de la suppression
      */
-    public function delete($id) {
+    public function delete($id)
+    {
         $query = "DELETE FROM " . $this->table_name . " WHERE UTILISATEURID = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);

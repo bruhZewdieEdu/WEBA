@@ -1,23 +1,5 @@
-<?php
-require_once '../../config/Database.php';
-require_once '../../controllers/UtilisateurController.php';
-
-
-if (!isset($_GET['id'])) {
-    die("ID utilisateur manquant.");
-}
-
-$id = intval($_GET['id']); // Assurez-vous que l'ID est un entier
-$user = $controller->getUserById($id);
-
-if (!$user) {
-    die("Utilisateur non trouvé.");
-}
-
-
-?>
-
 <h1>Modifier un utilisateur</h1>
+
 <form method="POST" action="index.php?action=update&id=<?= urlencode($user['UTILISATEURID']) ?>">
     <label>Nom :</label>
     <input type="text" name="nom" value="<?= htmlspecialchars($user['UTILISATEUR_NOM']); ?>" required>

@@ -1,17 +1,20 @@
 <?php
 require_once '../models/ModelUtilisateur.php';
 
-class UtilisateurController {
+class UtilisateurController
+{
     private $model;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new ModelUtilisateur();
     }
 
     /**
      * Affiche la liste des utilisateurs.
      */
-    public function index() {
+    public function index()
+    {
         $utilisateurs = $this->model->read(); // Récupération des utilisateurs depuis le modèle
         include '../views/utilisateurs/index.php'; // Inclure la vue
     }
@@ -19,7 +22,8 @@ class UtilisateurController {
     /**
      * Crée un nouvel utilisateur.
      */
-    public function create() {
+    public function create()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validation et sécurité des entrées utilisateur
             $nom = htmlspecialchars($_POST['nom']);
@@ -49,7 +53,8 @@ class UtilisateurController {
     /**
      * Modifie un utilisateur existant.
      */
-    public function update($id) {
+    public function update($id)
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validation et sécurité des entrées utilisateur
             $data = [
@@ -73,8 +78,8 @@ class UtilisateurController {
                 echo "Erreur lors de la mise à jour de l'utilisateur.";
             }
         } else {
-            $utilisateur = $this->model->readById($id); // Récupérer les données de l'utilisateur
-            if ($utilisateur) {
+            $user = $this->model->readById($id); // Récupérer les données de l'utilisateur
+            if ($user) {
                 include '../views/utilisateurs/edit.php'; // Charger la vue d'édition
             } else {
                 echo "Utilisateur non trouvé.";
@@ -85,9 +90,10 @@ class UtilisateurController {
     /**
      * Supprime un utilisateur.
      */
-    public function delete($id) {
+    public function delete($id)
+    {
         if ($this->model->delete($id)) {
-                header('Location: index.php'); // Redirection après succès
+            header('Location: index.php'); // Redirection après succès
             exit;
         } else {
             echo "Erreur lors de la suppression de l'utilisateur.";
@@ -98,7 +104,8 @@ class UtilisateurController {
      * Récupère un utilisateur par son ID.
      * Utile pour des actions spécifiques comme l'affichage ou l'édition.
      */
-    public function getUserById($id) {
+    public function getUserById($id)
+    {
         return $this->model->readById($id);
     }
 }

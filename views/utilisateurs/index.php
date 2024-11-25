@@ -3,10 +3,10 @@
     <ul>
         <?php foreach ($utilisateurs as $user) : ?>
             <li>
-                <?= htmlspecialchars($user['UTILISATEUR_NOM']) ?> 
-                <?= htmlspecialchars($user['UTILISATEUR_PRENOM']) ?> 
-                (<?= htmlspecialchars($user['UTILISATEUR_MAIL']) ?>) 
-                - <a href="../views/utilisateurs/edit.php?id=<?= urlencode($user['UTILISATEURID']) ?>">Modifier</a>
+                <?= htmlspecialchars($user['UTILISATEUR_NOM']) ?>
+                <?= htmlspecialchars($user['UTILISATEUR_PRENOM']) ?>
+                (<?= htmlspecialchars($user['UTILISATEUR_MAIL']) ?>)
+                - <a href="?action=edit&id=<?= urlencode($user['UTILISATEURID']) ?>">Modifier</a>
                 - <a href="?action=delete&id=<?= urlencode($user['UTILISATEURID']) ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
             </li>
         <?php endforeach; ?>

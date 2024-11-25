@@ -27,7 +27,7 @@ class Database
                 $host = "localhost";
                 $db_name = "didinho_bdd";
                 $username = "root";
-                $password = "";
+                $password = "root";
                 $dsn = "mysql:host=$host;dbname=$db_name;charset=utf8";
 
                 self::$instance = new PDO($dsn, $username, $password);
@@ -47,4 +47,3 @@ class Database
         return call_user_func_array([$instance, $method], $arguments);
     }
 }
-?>
