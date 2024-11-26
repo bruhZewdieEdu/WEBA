@@ -92,20 +92,27 @@ class UtilisateurController
      */
     public function delete($id)
     {
-        if ($this->model->delete($id)) {
-            header('Location: index.php'); // Redirection après succès
-            exit;
-        } else {
-            echo "Erreur lors de la suppression de l'utilisateur.";
+        $user = $this->model->readById($id); // Récupérer les informations de l'utilisateur
+        
+        if (!$user) {
+            die("Utilisateur non trouvé.");
         }
-    }
-
-    /**
-     * Récupère un utilisateur par son ID.
-     * Utile pour des actions spécifiques comme l'affichage ou l'édition.
-     */
-    public function getUserById($id)
-    {
-        return $this->model->readById($id);
+        
+        // Traitement de la demande de suppression
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
+                if ($this->model->delete($id)) {
+                    header("Location: index.php?message=Utilisateur supprimé avec succès");
+                    exit;
+                } else {
+                    echo "<p>Erreur lors de la suppression de l'utilisateur.</p>";
+                }
+            } else {
+                header("Location: index.php");
+                exit;
+            }
+        }else{
+            include '../views/utilisateurs/delete.php';
+        }
     }
 }
