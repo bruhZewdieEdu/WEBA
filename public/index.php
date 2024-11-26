@@ -24,7 +24,7 @@ if (isset($_GET['action'])) {
 
         case 'delete':
             if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-                include '../views/utilisateurs/delete.php'; // Charger la page de confirmation de suppression
+                $controller->delete($_GET['id']);
             } else {
                 echo "ID invalide ou manquant pour l'action 'delete'.";
             }
