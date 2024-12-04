@@ -1,6 +1,6 @@
 <h1>Modifier un utilisateur</h1>
 
-<form method="POST" action="index.php?action=update&id=<?= urlencode($user['UTILISATEURID']) ?>">
+<form method="POST" action="index.php?action=edit&id=<?= urlencode($user['UTILISATEURID']) ?>">
     <label>Nom :</label>
     <input type="text" name="nom" value="<?= htmlspecialchars($user['UTILISATEUR_NOM']); ?>" required>
     <br>

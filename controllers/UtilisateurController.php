@@ -67,7 +67,6 @@ class UtilisateurController
                 'statut' => htmlspecialchars($_POST['statut']),
                 'type' => htmlspecialchars($_POST['type'])
             ];
-
             // Mise à jour via le modèle
             $result = $this->model->update($id, $data['nom'], $data['prenom'], $data['date_naiss'], $data['adresse'], $data['mail'], $data['num_tel'], $data['statut'], $data['type']);
 
