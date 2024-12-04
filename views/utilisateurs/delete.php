@@ -1,33 +1,3 @@
-<?php
-
-// Vérification de la présence de l'ID utilisateur
-if (!isset($_GET['id'])) {
-    die("ID utilisateur manquant.");
-}
-
-$id = intval($_GET['id']); // S'assurer que l'ID est un entier
-$user = $controller->getUserById($id); // Récupérer les informations de l'utilisateur
-
-if (!$user) {
-    die("Utilisateur non trouvé.");
-}
-
-// Traitement de la demande de suppression
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
-        if ($controller->delete($id)) {
-            header("Location: index.php?message=Utilisateur supprimé avec succès");
-            exit;
-        } else {
-            echo "<p>Erreur lors de la suppression de l'utilisateur.</p>";
-        }
-    } else {
-        header("Location: index.php");
-        exit;
-    }
-}
-?>
-
 <h1>Supprimer un utilisateur</h1>
 <p>Êtes-vous sûr de vouloir supprimer l'utilisateur suivant ?</p>
 
