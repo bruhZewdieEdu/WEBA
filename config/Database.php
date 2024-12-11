@@ -26,8 +26,8 @@ class Database
             try {
                 $host = "localhost";
                 $db_name = "didinho_bdd";
-                $username = "root";
-                $password = "";
+                $username = "bruh";
+                $password = "123";
                 $dsn = "mysql:host=$host;dbname=$db_name;charset=utf8";
 
                 self::$instance = new PDO($dsn, $username, $password);
