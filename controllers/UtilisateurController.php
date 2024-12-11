@@ -25,25 +25,28 @@ class UtilisateurController
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Validation et sécurité des entrées utilisateur
-            $nom = htmlspecialchars($_POST['nom']);
-            $prenom = htmlspecialchars($_POST['prenom']);
-            $date_naiss = $_POST['date_naiss'];
-            $adresse = htmlspecialchars($_POST['adresse']);
-            $mail = filter_var($_POST['mail'], FILTER_SANITIZE_EMAIL);
-            $num_tel = htmlspecialchars($_POST['num_tel']);
-            $statut = htmlspecialchars($_POST['statut']);
-            $type = htmlspecialchars($_POST['type']);
-            $mdp = htmlspecialchars($_POST['mdp']);
+            // Validation des champs
+            $nom = !empty($_POST['nom']) ? htmlspecialchars(trim($_POST['nom'])) : null;
+            $prenom = !empty($_POST['prenom']) ? htmlspecialchars(trim($_POST['prenom'])) : null;
+            $date_naiss = !empty($_POST['date_naiss']) ? trim($_POST['date_naiss']) : null;
+            $adresse = !empty($_POST['adresse']) ? htmlspecialchars(trim($_POST['adresse'])) : null;
+            $mail = !empty($_POST['mail']) ? filter_var(trim($_POST['mail']), FILTER_SANITIZE_EMAIL) : null;
+            $num_tel = !empty($_POST['num_tel']) ? htmlspecialchars(trim($_POST['num_tel'])) : null;
+            $statut = !empty($_POST['statut']) ? htmlspecialchars(trim($_POST['statut'])) : null;
+            $type = !empty($_POST['type']) ? htmlspecialchars(trim($_POST['type'])) : null;
+            $mdp = !empty($_POST['mdp']) ? htmlspecialchars(trim($_POST['mdp'])) : null;
 
-            // Créer l'utilisateur via le modèle
-            $result = $this->model->create($nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp);
-
-            if ($result) {
-                header('Location: index.php'); // Redirection après succès
-                exit;
+            // Vérifier si tous les champs requis sont remplis
+            if ($nom && $prenom && $date_naiss && $adresse && $mail && $num_tel && $statut && $type && $mdp) {
+                $result = $this->model->create($nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp);
+                if ($result) {
+                    header('Location: index.php');
+                    exit;
+                } else {
+                    echo "Erreur lors de la création de l'utilisateur.";
+                }
             } else {
-                echo "Erreur lors de la création de l'utilisateur.";
+                echo "Tous les champs sont requis.";
             }
         } else {
             include '../views/utilisateurs/add.php'; // Afficher le formulaire
@@ -58,28 +61,32 @@ class UtilisateurController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validation et sécurité des entrées utilisateur
             $data = [
-                'nom' => htmlspecialchars($_POST['nom']),
-                'prenom' => htmlspecialchars($_POST['prenom']),
-                'date_naiss' => $_POST['date_naiss'],
-                'adresse' => htmlspecialchars($_POST['adresse']),
-                'mail' => filter_var($_POST['mail'], FILTER_SANITIZE_EMAIL),
-                'num_tel' => htmlspecialchars($_POST['num_tel']),
-                'statut' => htmlspecialchars($_POST['statut']),
-                'type' => htmlspecialchars($_POST['type'])
+                'nom' => !empty($_POST['nom']) ? htmlspecialchars(trim($_POST['nom'])) : null,
+                'prenom' => !empty($_POST['prenom']) ? htmlspecialchars(trim($_POST['prenom'])) : null,
+                'date_naiss' => !empty($_POST['date_naiss']) ? trim($_POST['date_naiss']) : null,
+                'adresse' => !empty($_POST['adresse']) ? htmlspecialchars(trim($_POST['adresse'])) : null,
+                'mail' => !empty($_POST['mail']) ? filter_var(trim($_POST['mail']), FILTER_SANITIZE_EMAIL) : null,
+                'num_tel' => !empty($_POST['num_tel']) ? htmlspecialchars(trim($_POST['num_tel'])) : null,
+                'statut' => !empty($_POST['statut']) ? htmlspecialchars(trim($_POST['statut'])) : null,
+                'type' => !empty($_POST['type']) ? htmlspecialchars(trim($_POST['type'])) : null,
             ];
-            // Mise à jour via le modèle
-            $result = $this->model->update($id, $data['nom'], $data['prenom'], $data['date_naiss'], $data['adresse'], $data['mail'], $data['num_tel'], $data['statut'], $data['type']);
 
-            if ($result) {
-                header('Location: index.php'); // Redirection après succès
-                exit;
+            if (array_filter($data)) {
+                // Mise à jour via le modèle
+                $result = $this->model->update($id, ...array_values($data));
+                if ($result) {
+                    header('Location: index.php');
+                    exit;
+                } else {
+                    echo "Erreur lors de la mise à jour de l'utilisateur.";
+                }
             } else {
-                echo "Erreur lors de la mise à jour de l'utilisateur.";
+                echo "Tous les champs sont requis pour la mise à jour.";
             }
         } else {
-            $user = $this->model->readById($id); // Récupérer les données de l'utilisateur
+            $user = $this->model->readById($id);
             if ($user) {
-                include '../views/utilisateurs/edit.php'; // Charger la vue d'édition
+                include '../views/utilisateurs/edit.php';
             } else {
                 echo "Utilisateur non trouvé.";
             }
@@ -92,25 +99,24 @@ class UtilisateurController
     public function delete($id)
     {
         $user = $this->model->readById($id); // Récupérer les informations de l'utilisateur
-        
+
         if (!$user) {
             die("Utilisateur non trouvé.");
         }
-        
-        // Traitement de la demande de suppression
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
                 if ($this->model->delete($id)) {
                     header("Location: index.php?message=Utilisateur supprimé avec succès");
                     exit;
                 } else {
-                    echo "<p>Erreur lors de la suppression de l'utilisateur.</p>";
+                    echo "Erreur lors de la suppression de l'utilisateur.";
                 }
             } else {
                 header("Location: index.php");
                 exit;
             }
-        }else{
+        } else {
             include '../views/utilisateurs/delete.php';
         }
     }
