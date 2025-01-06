@@ -28,3 +28,5 @@
     <button type="submit">Mettre à jour</button>
 </form>
 <a href="../public/index.php?action=index">Retour à la liste</a>
+<script src="../public/js/main.js"></script>
+<link rel="stylesheet" href="../public/css/styles.css">
