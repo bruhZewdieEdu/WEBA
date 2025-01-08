@@ -11,3 +11,5 @@
     <button type="submit" name="confirm" value="yes">Confirmer la suppression</button>
     <a href="index.php">Annuler</a>
 </form>
+<script src="../public/js/main.js"></script>
+<link rel="stylesheet" href="../public/css/styles.css">
