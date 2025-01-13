@@ -1,5 +1,7 @@
 <?php
 
+require_once 'parameters.php';
+
 class Database
 {
     // Instance unique de la classe
@@ -17,19 +19,22 @@ class Database
 
     /**
      * Méthode pour obtenir l'instance unique de la connexion à la base de données
-     * 
+     *
      * @return PDO Instance de connexion PDO
      */
     public static function getInstance()
     {
         if (!self::$instance) {
             try {
-                $host = "localhost";
-                $db_name = "didinho_bdd";
-                $username = "bruh";
-                $password = "123";
-                $dsn = "mysql:host=$host;dbname=$db_name;charset=utf8";
+                // Construction du DSN avec les constantes
+                $dsn = Parameters::EDB_DBTYPE . ":host=" . Parameters::EDB_HOST .
+                    ";port=" . Parameters::EDB_PORT .
+                    ";dbname=" . Parameters::EDB_DBNAME . ";charset=utf8";
 
+                $username = Parameters::EDB_USER;
+                $password = Parameters::EDB_PASS;
+
+                // Création de l'instance PDO
                 self::$instance = new PDO($dsn, $username, $password);
                 self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
@@ -39,7 +44,6 @@ class Database
         }
         return self::$instance;
     }
-
 
     public static function __callStatic($method, $arguments)
     {
