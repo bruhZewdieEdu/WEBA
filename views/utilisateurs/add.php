@@ -39,4 +39,3 @@
 </form>
 
 <a href="../public/index.php?action=index">Retour à la liste</a>
-<link rel="stylesheet" href="../public/css/styles.css">

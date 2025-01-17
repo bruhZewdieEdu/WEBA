@@ -1,63 +1,103 @@
 <?php if (!empty($utilisateurs)) : ?>
-    <h1>Navigation entre les utilisateurs</h1>
-    <div id="userContainer">
-        <!-- L'utilisateur actif sera affiché ici -->
-        <h2 id="userName"><?= htmlspecialchars($utilisateurs[0]['UTILISATEUR_NOM'] . ' ' . $utilisateurs[0]['UTILISATEUR_PRENOM']) ?></h2>
-        <p id="userEmail"><?= htmlspecialchars($utilisateurs[0]['UTILISATEUR_MAIL']) ?></p>
-    </div>
-    <div class="navigation-buttons">
-        <button id="prevButton" onclick="showPrevious()">Précédent</button>
-        <button id="nextButton" onclick="showNext()">Suivant</button>
-    </div>
+    <!DOCTYPE html>
+    <html lang="fr">
 
-    <script>
-        // Tableau PHP converti en tableau JS
-        const users = [
-            <?php foreach ($utilisateurs as $user) : ?>
-                {
-                    name: '<?= addslashes($user['UTILISATEUR_NOM'] . ' ' . $user['UTILISATEUR_PRENOM']) ?>',
-                    email: '<?= addslashes($user['UTILISATEUR_MAIL']) ?>'
-                },
-            <?php endforeach; ?>
-        ];
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Navigation entre les utilisateurs</title>
+    </head>
 
-        let currentIndex = 0; // Index de l'utilisateur actif
+    <body>
+        <h1>Navigation entre les utilisateurs</h1>
+        <div id="userContainer">
+            <!-- L'utilisateur actif sera affiché ici -->
+            <h2 id="userName"><?= htmlspecialchars($utilisateurs[0]['UTILISATEUR_NOM'] . ' ' . $utilisateurs[0]['UTILISATEUR_PRENOM']) ?></h2>
+            <p id="userEmail"><?= htmlspecialchars($utilisateurs[0]['UTILISATEUR_MAIL']) ?></p>
+        </div>
+        <div class="navigation-buttons">
+            <button id="prevButton">Précédent</button>
+            <button id="nextButton">Suivant</button>
+        </div>
 
-        // Références des éléments DOM
-        const userName = document.getElementById("userName");
-        const userEmail = document.getElementById("userEmail");
-        const prevButton = document.getElementById("prevButton");
-        const nextButton = document.getElementById("nextButton");
+        <!-- Script contenant le tableau PHP converti en tableau JS et le JavaScript -->
+        <script>
+            // Tableau PHP converti en tableau JS
+            const users = [
+                <?php foreach ($utilisateurs as $user) : ?> {
+                        name: '<?= addslashes($user['UTILISATEUR_NOM'] . ' ' . $user['UTILISATEUR_PRENOM']) ?>',
+                        email: '<?= addslashes($user['UTILISATEUR_MAIL']) ?>'
+                    },
+                <?php endforeach; ?>
+            ];
 
-        // Fonction pour mettre à jour l'affichage
-        function updateDisplay() {
-            userName.textContent = users[currentIndex].name;
-            userEmail.textContent = users[currentIndex].email;
+            let currentIndex = 0; // Index de l'utilisateur actif
 
-            // Activer ou désactiver les boutons en fonction de la position
-            prevButton.disabled = currentIndex === 0;
-            nextButton.disabled = currentIndex === users.length - 1;
-        }
+            // Références des éléments DOM
+            const userContainer = document.getElementById("userContainer");
+            const prevButton = document.getElementById("prevButton");
+            const nextButton = document.getElementById("nextButton");
 
-        // Fonction pour afficher l'utilisateur précédent
-        function showPrevious() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateDisplay();
+            // Fonction pour créer et afficher un utilisateur dans le DOM
+            function renderUser(user) {
+                userContainer.innerHTML = ""; // Nettoyer le conteneur
+
+                const userCard = document.createElement("div");
+                userCard.classList.add("user-card");
+
+                const userName = document.createElement("h2");
+                userName.textContent = user.name;
+
+                const userEmail = document.createElement("p");
+                userEmail.textContent = user.email;
+
+                userCard.appendChild(userName);
+                userCard.appendChild(userEmail);
+                userContainer.appendChild(userCard);
             }
-        }
 
-        // Fonction pour afficher l'utilisateur suivant
-        function showNext() {
-            if (currentIndex < users.length - 1) {
-                currentIndex++;
-                updateDisplay();
+            // Fonction pour mettre à jour l'affichage
+            function updateDisplay() {
+                if (!users || users.length === 0) {
+                    userContainer.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
+                    prevButton.disabled = true;
+                    nextButton.disabled = true;
+                    return;
+                }
+
+                renderUser(users[currentIndex]);
+
+                // Activer ou désactiver les boutons
+                prevButton.disabled = currentIndex === 0;
+                nextButton.disabled = currentIndex === users.length - 1;
             }
-        }
 
-        // Initialiser l'affichage
-        updateDisplay();
-    </script>
+            // Fonction pour afficher l'utilisateur précédent
+            function showPrevious() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateDisplay();
+                }
+            }
+
+            // Fonction pour afficher l'utilisateur suivant
+            function showNext() {
+                if (currentIndex < users.length - 1) {
+                    currentIndex++;
+                    updateDisplay();
+                }
+            }
+
+            // Ajouter les gestionnaires d'événements
+            prevButton.addEventListener("click", showPrevious);
+            nextButton.addEventListener("click", showNext);
+
+            // Initialiser l'affichage
+            updateDisplay();
+        </script>
+    </body>
+
+    </html>
 <?php else : ?>
     <p>Aucun utilisateur trouvé.</p>
 <?php endif; ?>
