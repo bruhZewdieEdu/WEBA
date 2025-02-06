@@ -12,8 +12,6 @@
         <h1>Navigation entre les utilisateurs</h1>
         <div id="userContainer">
             <!-- L'utilisateur actif sera affiché ici -->
-            <h2 id="userName"><?= htmlspecialchars($utilisateurs[0]['UTILISATEUR_NOM'] . ' ' . $utilisateurs[0]['UTILISATEUR_PRENOM']) ?></h2>
-            <p id="userEmail"><?= htmlspecialchars($utilisateurs[0]['UTILISATEUR_MAIL']) ?></p>
         </div>
         <div class="navigation-buttons">
             <button id="prevButton">Précédent</button>
@@ -25,6 +23,7 @@
             // Tableau PHP converti en tableau JS
             const users = [
                 <?php foreach ($utilisateurs as $user) : ?> {
+                        id: '<?= $user['UTILISATEURID'] ?>',
                         name: '<?= addslashes($user['UTILISATEUR_NOM'] . ' ' . $user['UTILISATEUR_PRENOM']) ?>',
                         email: '<?= addslashes($user['UTILISATEUR_MAIL']) ?>'
                     },
@@ -51,8 +50,16 @@
                 const userEmail = document.createElement("p");
                 userEmail.textContent = user.email;
 
+                // Bouton Modifier
+                const editButton = document.createElement("button");
+                editButton.textContent = "Modifier";
+                editButton.addEventListener("click", function() {
+                    window.location.href = `index.php?action=edit&id=${user.id}`;
+                });
+
                 userCard.appendChild(userName);
                 userCard.appendChild(userEmail);
+                userCard.appendChild(editButton);
                 userContainer.appendChild(userCard);
             }
 
