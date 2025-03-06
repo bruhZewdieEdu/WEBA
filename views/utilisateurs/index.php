@@ -1,112 +1,129 @@
-<?php if (!empty($utilisateurs)) : ?>
-    <!DOCTYPE html>
-    <html lang="fr">
+<!DOCTYPE html> 
+<html lang="fr">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Navigation entre les utilisateurs</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des utillisateurs</title>
+</head>
 
-    <body>
-        <h1>Navigation entre les utilisateurs</h1>
-        <div id="userContainer">
-            <!-- L'utilisateur actif sera affiché ici -->
-        </div>
-        <div class="navigation-buttons">
-            <button id="prevButton">Précédent</button>
-            <button id="nextButton">Suivant</button>
-        </div>
+<body>
+    <h1>Liste des utillisateurs</h1>
 
-        <!-- Script contenant le tableau PHP converti en tableau JS et le JavaScript -->
-        <script>
-            // Tableau PHP converti en tableau JS
-            const users = [
-                <?php foreach ($utilisateurs as $user) : ?> {
-                        id: '<?= $user['UTILISATEURID'] ?>',
-                        name: '<?= addslashes($user['UTILISATEUR_NOM'] . ' ' . $user['UTILISATEUR_PRENOM']) ?>',
-                        email: '<?= addslashes($user['UTILISATEUR_MAIL']) ?>'
-                    },
-                <?php endforeach; ?>
-            ];
+    <!-- Champ de recherche + bouton -->
+    <input type="text" id="searchInput" placeholder="Rechercher un utilisateur..." />
+    <button id="searchButton">Rechercher</button>
 
-            let currentIndex = 0; // Index de l'utilisateur actif
+    <div id="searchResults"></div>
 
-            // Références des éléments DOM
-            const userContainer = document.getElementById("userContainer");
-            const prevButton = document.getElementById("prevButton");
-            const nextButton = document.getElementById("nextButton");
+    <div id="userContainer">
+        <!-- L'utilisateur actif sera affiché ici -->
+    </div>
 
-            // Fonction pour créer et afficher un utilisateur dans le DOM
-            function renderUser(user) {
-                userContainer.innerHTML = ""; // Nettoyer le conteneur
+    <div class="navigation-buttons">
+        <button id="prevButton">Précédent</button>
+        <button id="nextButton">Suivant</button>
+    </div>
 
-                const userCard = document.createElement("div");
-                userCard.classList.add("user-card");
+    <a href="?action=create">Ajouter un utilisateur</a>
 
-                const userName = document.createElement("h2");
-                userName.textContent = user.name;
+    <script>
+        let users = []; // Tableau pour stocker les utilisateurs
+        let currentIndex = 0; // Index de l'utilisateur actif
 
-                const userEmail = document.createElement("p");
-                userEmail.textContent = user.email;
+        // Références des éléments DOM
+        const searchInput = document.getElementById("searchInput");
+        const searchButton = document.getElementById("searchButton");
+        const searchResults = document.getElementById("searchResults");
+        const userContainer = document.getElementById("userContainer");
+        const prevButton = document.getElementById("prevButton");
+        const nextButton = document.getElementById("nextButton");
 
-                // Bouton Modifier
-                const editButton = document.createElement("button");
-                editButton.textContent = "Modifier";
-                editButton.addEventListener("click", function() {
-                    window.location.href = `index.php?action=edit&id=${user.id}`;
-                });
+        // Fonction AJAX pour charger les utilisateurs depuis la base de données
+        function fetchUsers(query = "") {
+            fetch(`search.php?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    users = data; // Mettre à jour la liste des utilisateurs
+                    currentIndex = 0; // Réinitialiser l'index
+                    updateDisplay(); // Mettre à jour l'affichage
+                })
+                .catch(error => console.error("Erreur lors de la récupération des utilisateurs :", error));
+        }
 
-                userCard.appendChild(userName);
-                userCard.appendChild(userEmail);
-                userCard.appendChild(editButton);
-                userContainer.appendChild(userCard);
+        // Fonction pour afficher un utilisateur
+        function renderUser(user) {
+            userContainer.innerHTML = ""; // Nettoyer le conteneur
+
+            const userCard = document.createElement("div");
+            userCard.classList.add("user-card");
+
+            const userName = document.createElement("h2");
+            userName.textContent = user.UTILISATEUR_NOM + " " + user.UTILISATEUR_PRENOM;
+
+            const userEmail = document.createElement("p");
+            userEmail.textContent = user.UTILISATEUR_MAIL;
+
+            // Bouton Modifier
+            const editButton = document.createElement("button");
+            editButton.textContent = "Modifier";
+            editButton.addEventListener("click", function () {
+                window.location.href = `index.php?action=edit&id=${user.UTILISATEURID}`;
+            });
+
+            userCard.appendChild(userName);
+            userCard.appendChild(userEmail);
+            userCard.appendChild(editButton);
+            userContainer.appendChild(userCard);
+        }
+
+        // Fonction pour mettre à jour l'affichage
+        function updateDisplay() {
+            searchResults.innerHTML = ""; // Nettoyer les résultats de recherche
+
+            if (!users || users.length === 0) {
+                userContainer.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
+                prevButton.disabled = true;
+                nextButton.disabled = true;
+                return;
             }
 
-            // Fonction pour mettre à jour l'affichage
-            function updateDisplay() {
-                if (!users || users.length === 0) {
-                    userContainer.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
-                    prevButton.disabled = true;
-                    nextButton.disabled = true;
-                    return;
-                }
+            renderUser(users[currentIndex]);
 
-                renderUser(users[currentIndex]);
+            // Activer ou désactiver les boutons
+            prevButton.disabled = currentIndex === 0;
+            nextButton.disabled = currentIndex === users.length - 1;
+        }
 
-                // Activer ou désactiver les boutons
-                prevButton.disabled = currentIndex === 0;
-                nextButton.disabled = currentIndex === users.length - 1;
+        // Fonction pour afficher l'utilisateur précédent
+        function showPrevious() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateDisplay();
             }
+        }
 
-            // Fonction pour afficher l'utilisateur précédent
-            function showPrevious() {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    updateDisplay();
-                }
+        // Fonction pour afficher l'utilisateur suivant
+        function showNext() {
+            if (currentIndex < users.length - 1) {
+                currentIndex++;
+                updateDisplay();
             }
+        }
 
-            // Fonction pour afficher l'utilisateur suivant
-            function showNext() {
-                if (currentIndex < users.length - 1) {
-                    currentIndex++;
-                    updateDisplay();
-                }
-            }
+        // Gestionnaire de recherche sur clic du bouton
+        searchButton.addEventListener("click", function () {
+            let query = searchInput.value.trim();
+            fetchUsers(query); // Charger les utilisateurs filtrés
+        });
 
-            // Ajouter les gestionnaires d'événements
-            prevButton.addEventListener("click", showPrevious);
-            nextButton.addEventListener("click", showNext);
+        // Ajouter les gestionnaires d'événements
+        prevButton.addEventListener("click", showPrevious);
+        nextButton.addEventListener("click", showNext);
 
-            // Initialiser l'affichage
-            updateDisplay();
-        </script>
-    </body>
+        // Charger les utilisateurs au démarrage
+        fetchUsers();
+    </script>
+</body>
 
-    </html>
-<?php else : ?>
-    <p>Aucun utilisateur trouvé.</p>
-<?php endif; ?>
-
-<a href="?action=create">Ajouter un utilisateur</a>
+</html>
