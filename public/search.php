@@ -4,8 +4,9 @@ header('Content-Type: application/json');
 
 if (isset($_GET['query'])) {
     $searchQuery = trim($_GET['query']);
+
     $model = new ModelUtilisateur();
-    $results = $model->search($searchQuery);
+    $results = $model->search($searchQuery); // Recherche sans pagination
 
     echo json_encode($results);
 } else {

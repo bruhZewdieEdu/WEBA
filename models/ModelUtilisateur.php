@@ -52,19 +52,23 @@ class ModelUtilisateur
      * @return bool Résultat de l'insertion
      */
     
-     public function search($query)
-{
-    $sql = "SELECT * FROM " . $this->table_name . " 
-            WHERE UTILISATEUR_NOM LIKE :query 
-            OR UTILISATEUR_PRENOM LIKE :query 
-            OR UTILISATEUR_MAIL LIKE :query";
-
-    $stmt = $this->conn->prepare($sql);
-    $searchTerm = "%" . $query . "%";
-    $stmt->bindParam(":query", $searchTerm, PDO::PARAM_STR);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+     public function search($query, $limit = 10, $offset = 0)
+     {
+         $sql = "SELECT * FROM " . $this->table_name . " 
+                 WHERE UTILISATEUR_NOM LIKE :query 
+                 OR UTILISATEUR_PRENOM LIKE :query 
+                 OR UTILISATEUR_MAIL LIKE :query
+                 LIMIT :limit OFFSET :offset";
+     
+         $stmt = $this->conn->prepare($sql);
+         $searchTerm = "%" . $query . "%";
+         $stmt->bindParam(":query", $searchTerm, PDO::PARAM_STR);
+         $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+         $stmt->bindParam(":offset", $offset, PDO::PARAM_INT);
+         $stmt->execute();
+         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+     }
+     
 
      public function create($nom, $prenom, $date_naiss, $adresse, $mail, $num_tel, $statut, $type, $mdp)
     {
