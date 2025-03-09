@@ -31,14 +31,15 @@
 
         // Fonction AJAX pour charger les utilisateurs depuis la base de données
         function fetchUsers(query = "") {
-            fetch(`search.php?query=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    users = data; // Mettre à jour la liste des utilisateurs
-                    updateDisplay(); // Mettre à jour l'affichage
-                })
-                .catch(error => console.error("Erreur lors de la récupération des utilisateurs :", error));
-        }
+    fetch(`index.php?action=search&query=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            users = data;
+            updateDisplay();
+        })
+        .catch(error => console.error("Erreur AJAX :", error));
+}
+
 
         // Fonction pour afficher plusieurs utilisateurs
         function renderUsers(usersList) {

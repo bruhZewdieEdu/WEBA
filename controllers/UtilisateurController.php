@@ -18,7 +18,14 @@ class UtilisateurController
         $utilisateurs = $this->model->read(); // Récupération des utilisateurs depuis le modèle
         include '../views/utilisateurs/index.php'; // Inclure la vue
     }
-
+    public function search($query) {
+        $query = trim(htmlspecialchars($query)); // Sécurisation
+        $model = new ModelUtilisateur();
+        $results = $model->search($query);
+        header('Content-Type: application/json');
+        echo json_encode($results);
+    }
+    
     /**
      * Crée un nouvel utilisateur.
      */

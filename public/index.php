@@ -10,6 +10,15 @@ if (isset($_GET['action'])) {
     $action = $_GET['action'];
 
     switch ($action) {
+        case 'search':
+            if (isset($_GET['query'])) {
+                $controller->search($_GET['query']);
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "Aucune requête fournie"]);
+            }
+            break;
+        
         case 'create':
             $controller->create(); // Ajouter un utilisateur
             break;
